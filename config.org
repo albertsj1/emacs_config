@@ -1,0 +1,139 @@
+:DOC-CONFIG:
+# Tangle by default to config.el, which is the most common case
+#+property: header-args:emacs-lisp :tangle config.el
+#+property: header-args :mkdirp yes :comments no
+#+startup: fold
+:END:
+
+#+title: Doom Emacs configuration
+#+author: John Alberts
+#+email: john.m.alberts@gmail.com
+
+This is my personal [[https://github.com/doomemacs/doomemacs][Doom Emacs]] literate configuration.
+
+* References
+I've learned how to do this from a lot of different places and pieced together what works for me.
+- [[https://zzamboni.org/post/my-doom-emacs-configuration-with-commentary/][Diego Zamboni literate Emacs configuration]]
+  A good chunk of the beginning of this file was taken from Diego's literate configuration.  Thank you Diego.
+
+* Doom config file overview
+
+Doom Emacs uses three config files:
+
+
+- =init.el= defines which of the existing Doom [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org#modules][modules]] are loaded. A Doom module is a bundle of packages, configuration and commands, organized into a unit that can
+ be toggled easily from this file.
+- =packages.el= defines which [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org#package-management][packages]] should be installed, beyond those that are installed and loaded as part of the enabled modules.
+- =config.el= contains all [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org#configuring-doom][custom configuration]] and code.
+
+There are other files that can be loaded, but theses are the main ones. The load order of different files is [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org#load-order][defined depending on the type of session]] being start
+ed.
+
+All the config files are generated from this Org file, to try and make its meaning as clear as possible. All =package!= declarations are written to =packages.el=, all other LISP code is written to =config.el=.
+
+
+* General
+Some functionality uses this to identify you, e.g. GPG configuration, email
+clients, file templates and snippets.
+#+begin_src emacs-lisp
+(setq user-full-name "John Alberts"
+      user-mail-address "john.m.alberts@gmail.com"
+      server-name "doom")
+#+end_src
+
+* Org Mode
+** General Configuration
+If you use `org' and don't want your org files in the default location below,
+change `org-directory'. It must be set before org loads!
+#+begin_src emacs-lisp
+(setq org-directory "~/notes/org/")
+#+end_src
+** Task Management
+Enable logging of done tasks, and log stuff into the LOGBOOK drawer by default
+#+begin_src emacs-lisp
+(after! org
+  (setq org-log-done t)
+  (setq org-log-into-drawer t))
+#+end_src
+
+** org-ql
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-ql)
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-ql
+  :after org)
+#+end_src
+
+** Capturing links to external applications
+=org-mac-link= implements the ability to grab links from different Mac apps and insert them in the file. Bind =C-c g= to call =org-mac-grab-link= to choose an application and insert a link.
+#+begin_src emacs-lisp :tangle packages.el
+(when IS-MAC
+  (package! org-mac-link :recipe
+    (:host gitlab
+     :repo "albertsj1/org-mac-link")))
+#+end_src
+#+begin_src emacs-lisp
+(when IS-MAC
+  (use-package! org-mac-link
+    :after org
+    :config
+    (setq org-mac-grab-devonthink-app-p nil) ; Don't show some apps I don't use
+    (setq org-mac-link-mail-app-p nil)
+    (setq org-mac-link-brave-app-p nil)
+    (setq org-mac-link-qutebrowser-app-p nil)
+    (map! :map org-mode-map
+          "C-c g"  #'org-mac-link-link)))
+#+end_src
+
+** Search
+*** Deadgrep configuration
+This allows me to quickly search my org files using deadgrep.
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! deadgrep)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(defun deadgrep-orgdir (search-term)
+      (interactive (list (deadgrep--read-search-term)))
+      (deadgrep search-term org-directory))
+(use-package! deadgrep
+  :config
+    (map! "S-<f5>" #'deadgrep
+          "<f5>" #'deadgrep-orgdir))
+#+END_SRC
+
+** Org Roam
+Customize how nodes are shown when searching
+Some org-roam stuff from: https://www.alexeyshmalko.com/migrating-to-org-roam-v2/
+and From: https://org-roam.discourse.group/t/how-to-best-follow-up-on-todo-in-notes/2429/10
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-roam
+  :after org
+  :config
+(cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
+  (let ((level (org-roam-node-level node)))
+    (concat
+     (when (> level 0) (concat (org-roam-node-file-title node) " > "))
+     (when (> level 1) (concat (string-join (org-roam-node-olp node) " > ") " > "))
+     (org-roam-node-title node))))
+
+  (setq org-roam-mode-section-functions
+      (list #'org-roam-backlinks-section
+            #'org-roam-reflinks-section
+            #'org-roam-unlinked-references-section))
+  ;;(setq org-roam-node-display-template "${title:100} ${backlinkscount:6} ${todostate:20} ${directories:10} ${tags:25}")
+
+
+  (setq org-roam-node-display-template
+      (concat "${hierarchy:48} " (propertize "${tags:20}" 'face 'org-tag))
+      org-roam-node-annotation-function
+      (lambda (node) (marginalia--time (org-roam-node-file-mtime node))))
+
+;;  (setq org-roam-node-display-template (concat "${hierarchy:*} " (propertize "${tags:20}" 'face 'org-tag))
+;;    org-roam-node-annotation-function
+;;    (lambda (node) (marginalia--time (org-roam-node-file-mtime node)))))
+
+)
+#+end_src

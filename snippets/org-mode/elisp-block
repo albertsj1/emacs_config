@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# contributor: John Alberts
+# name: elisp-block
+# uuid:
+# key: se<
+# condition: t
+# --
+#+BEGIN_SRC emacs-lisp
+$0
+#+END_SRC

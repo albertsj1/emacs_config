@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: interview_preface
+# uuid: interview_preface
+# key: interview_preface
+# --
+- Offer a break/get water, etc.
+- Introductions
+- Set expectations:
+  - The interview process at Amazon is data driven, so I will be taking thorough notes/typing throughout the interview.  I have multiple monitors, so you might see me occasionally looking at other screens.  I just want to reassure you that you have my full attention.
+  - Also, while you are answering a question, if I interrupt you to ask a follow up question or to move to a different topic, I just want to reassure you that it's not because of something you said.  It's just part of the interview process and I want to make sure we have time to cover everything in the time allotted.
