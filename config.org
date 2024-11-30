@@ -11,6 +11,19 @@
 
 This is my personal [[https://github.com/doomemacs/doomemacs][Doom Emacs]] literate configuration.
 
+* Table of Contents :TOC:
+- [[#references][References]]
+- [[#doom-config-file-overview][Doom config file overview]]
+- [[#general][General]]
+- [[#fonts][Fonts]]
+- [[#org-mode][Org Mode]]
+  - [[#general-configuration][General Configuration]]
+  - [[#task-management][Task Management]]
+  - [[#org-ql][org-ql]]
+  - [[#capturing-links-to-external-applications][Capturing links to external applications]]
+  - [[#search][Search]]
+  - [[#org-roam][Org Roam]]
+
 * References
 I've learned how to do this from a lot of different places and pieced together what works for me.
 - [[https://zzamboni.org/post/my-doom-emacs-configuration-with-commentary/][Diego Zamboni literate Emacs configuration]]
@@ -41,6 +54,19 @@ clients, file templates and snippets.
       server-name "doom")
 #+end_src
 
+* Fonts
+# Taken from: https://github.com/karthink/.emacs.d/blob/84fc5f5efac3f7b8b318fe87f62f4ae9246c48ae/init.el#L4491
+#+begin_src emacs-lisp
+(use-package cus-face
+  :config
+  (pcase-dolist (`(,font           . ,scale)
+                 '(("Merriweather" . 0.88)
+                   ("IM FELL"      . 1.18)
+                   ("Latin Modern" . 1.05)))
+    (setf (alist-get font face-font-rescale-alist nil nil #'equal)
+          scale)))
+
+#+end_src
 * Org Mode
 ** General Configuration
 If you use `org' and don't want your org files in the default location below,
