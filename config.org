@@ -16,6 +16,7 @@ This is my personal [[https://github.com/doomemacs/doomemacs][Doom Emacs]] liter
 - [[#doom-config-file-overview][Doom config file overview]]
 - [[#general][General]]
 - [[#fonts][Fonts]]
+- [[#obsidian][Obsidian]]
 - [[#org-mode][Org Mode]]
   - [[#general-configuration][General Configuration]]
   - [[#task-management][Task Management]]
@@ -66,6 +67,42 @@ clients, file templates and snippets.
     (setf (alist-get font face-font-rescale-alist nil nil #'equal)
           scale)))
 
+#+end_src
+* Obsidian
+
+#+begin_src emacs-lisp :tangle no
+(package! obsidian)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+(use-package! obsidian
+
+  (setq obsidian-specify-path "~/personal_sync/obsidian/personal")
+  (global-obsidian-mode t)
+
+  :config
+  ;; This directory will be used for `obsidian-capture' if set.
+  (setq obsidian-inbox-directory "Inbox")
+  ;; Create missing files in inbox? - when clicking on a wiki link
+  ;; t: in inbox, nil: next to the file with the link
+  ;; default: t
+  ;(obsidian-wiki-link-create-file-in-inbox nil)
+  ;; The directory for daily notes (file name is YYYY-MM-DD.md)
+  (setq obsidian-daily-notes-directory "Daily Notes")
+  ;; Directory of note templates, unset (nil) by default
+  ;(obsidian-templates-directory "Templates")
+  ;; Daily Note template name - requires a template directory. Default: Daily Note Template.md
+  ;(obsidian-daily-note-template "Daily Note Template.md")
+  (map! :map obsidian-mode-mapp
+  ;; Replace C-c C-o with Obsidian.el's implementation. It's ok to use another key binding.
+        "C-c C-o" #'obsidian-follow-link-at-point
+  ;; Jump to backlinks
+
+
+
+        "C-c C-b" #'obsidian-backlink-jump
+  ;; If you prefer you can use `obsidian-insert-link'
+        "C-c C-l" #'obsidian-insert-wikilink))
 #+end_src
 * Org Mode
 ** General Configuration
